@@ -36,6 +36,11 @@ yarn-error.log*
 # vercel
 .vercel
 
+# local tooling + iCloud duplicate junk
+.claude/
+*\ 2.json
+*\ 2.*
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
