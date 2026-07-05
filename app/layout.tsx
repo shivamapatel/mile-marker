@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import { Lora, DM_Sans } from 'next/font/google'
 import './globals.css'
-import Nav from '@/components/Nav'
 
 const dmSans = DM_Sans({
   subsets: ['latin'],
@@ -24,10 +23,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${dmSans.variable} ${lora.variable}`}>
       <body className="min-h-screen font-sans">
-        <main className="max-w-md mx-auto px-4 pt-8 pb-24">
-          {children}
-        </main>
-        <Nav />
+        {children}
       </body>
     </html>
   )

@@ -32,7 +32,7 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="min-h-screen bg-espresso flex flex-col items-center justify-center px-6 text-center">
+    <main className="min-h-dvh bg-espresso flex flex-col items-center justify-center px-6 text-center">
       <img
         src="/brand/logo-light.png"
         alt="Mile Marker"
