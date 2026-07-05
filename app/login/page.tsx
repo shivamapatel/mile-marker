@@ -32,16 +32,20 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-cream flex flex-col items-center justify-center px-6">
-      <div className="w-full max-w-sm space-y-8">
+    <main className="min-h-screen bg-espresso flex flex-col items-center justify-center px-6 text-center">
+      <img
+        src="/brand/logo-light.png"
+        alt="Mile Marker"
+        className="w-[280px] max-w-[80%] h-auto mb-7"
+      />
+      <h1 className="font-serif font-semibold text-[34px] text-cream mb-2.5">Mile Marker</h1>
+      <p className="text-[15px] text-mocha max-w-[340px] leading-relaxed mb-10">
+        A private place to reflect on every run.
+      </p>
 
-        <div>
-          <h1 className="text-2xl font-semibold text-espresso font-serif">Mile Marker</h1>
-          <p className="text-sm text-mocha mt-1">Your private post-run journal.</p>
-        </div>
-
+      <div className="w-full max-w-sm">
         {sent ? (
-          <div className="bg-ivory rounded-2xl border border-sand p-6 space-y-2">
+          <div className="bg-ivory rounded-2xl border border-sand p-6 space-y-2 text-left">
             <p className="text-sm font-medium text-espresso">Check your email</p>
             <p className="text-sm text-mocha">
               We sent a sign-in link to <span className="text-espresso">{email}</span>.
@@ -49,7 +53,7 @@ export default function LoginPage() {
             </p>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4 text-left">
             <div className="space-y-1.5">
               <label htmlFor="email" className="text-xs text-mocha">
                 Email
@@ -66,19 +70,19 @@ export default function LoginPage() {
             </div>
 
             {error && (
-              <p className="text-xs text-sienna">{error}</p>
+              <p className="text-xs text-sienna-light">{error}</p>
             )}
 
             <button
               type="submit"
               disabled={loading || !email}
-              className="w-full bg-sienna-dark text-ivory text-sm font-medium rounded-xl py-3 hover:bg-sienna transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-ivory text-espresso text-sm font-medium rounded-xl py-3 hover:bg-cream transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Sending…' : 'Send magic link'}
             </button>
           </form>
         )}
       </div>
-    </div>
+    </main>
   )
 }

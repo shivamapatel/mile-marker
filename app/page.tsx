@@ -67,7 +67,10 @@ export default function Dashboard() {
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold text-espresso font-serif">Mile Marker</h1>
+        <div className="flex items-center gap-2.5">
+          <img src="/brand/logo.png" alt="" className="w-11 h-auto" />
+          <span className="text-xl font-semibold text-espresso font-serif">Mile Marker</span>
+        </div>
         <button
           onClick={handleSignOut}
           className="text-xs text-mocha hover:text-espresso transition-colors"
