@@ -6,6 +6,7 @@ import { useReflections } from '@/lib/useReflections'
 import { useActivities } from '@/lib/useActivities'
 import { formatDistance, formatDuration, formatPace, formatShortDate } from '@/lib/utils'
 import { createClient } from '@/lib/supabase/client'
+import PushReminderCard from '@/components/PushReminderCard'
 
 const STRAVA_ERROR_TEXT: Record<string, string> = {
   config: 'Strava isn’t configured yet. Add the Strava env vars and try again.',
@@ -107,6 +108,8 @@ export default function Dashboard() {
         </div>
         {stravaMsg && <p className="text-xs text-mocha mt-2">{stravaMsg}</p>}
       </section>
+
+      <PushReminderCard />
 
       {/* Uncaptured run prompt */}
       {latestUncaptured ? (

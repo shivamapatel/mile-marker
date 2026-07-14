@@ -1,5 +1,6 @@
-import { NextResponse, type NextRequest } from 'next/server'
+import { after, NextResponse, type NextRequest } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { sendRunNotification } from '@/lib/push'
 import {
   getUserIdByStravaAthleteId,
   syncStravaActivities,
@@ -73,42 +74,43 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ received: true })
   }
 
-  // Map the (untrusted) athlete id to a known Mile Marker user. We NEVER take a
-  // user_id from the payload — the only thing we trust is "does this athlete id
-  // correspond to a connection we already stored?" If not, write nothing.
-  const userId = await getUserIdByStravaAthleteId(event.owner_id)
-  if (!userId) {
-    console.warn(
-      `[strava webhook] no connection for athlete ${event.owner_id} — ignoring`
-    )
-    return NextResponse.json({ received: true })
-  }
+  // Strava expects a fast acknowledgement. Resolve the verified user, sync the
+  // run, and deliver any notification after the response has been sent.
+  after(async () => {
+    // Map the untrusted athlete id to a connection stored by Mile Marker. We
+    // never accept a Mile Marker user id from the webhook payload.
+    const userId = await getUserIdByStravaAthleteId(event.owner_id!)
+    if (!userId) {
+      console.warn(
+        `[strava webhook] no connection for athlete ${event.owner_id} — ignoring`
+      )
+      return
+    }
 
-  console.log(
-    `[strava webhook] activity ${event.object_id} for athlete ${event.owner_id} → user ${userId}; syncing`
-  )
-
-  // Pull fresh activities for this user and upsert them.
-  //
-  // We pass the admin client here (not a user-scoped client) because this
-  // request has no Supabase session — Strava called us, not the user. This is
-  // the single, contained place where activity writes use the service role.
-  // It is safe because: (a) userId came from our own strava_connections lookup,
-  // not the payload; (b) syncStravaActivities always sets user_id explicitly to
-  // that verified value; (c) the upsert is keyed on (user_id, id), so it can
-  // only touch this user's own rows.
-  try {
-    const result = await syncStravaActivities(userId, createAdminClient())
     console.log(
-      `[strava webhook] sync ok for user ${userId}: ${result.synced} activit${
-        result.synced === 1 ? 'y' : 'ies'
-      } upserted`
+      `[strava webhook] activity ${event.object_id} for athlete ${event.owner_id} → user ${userId}; syncing`
     )
-  } catch (e) {
-    // Log and still return 200 — Strava retries on non-2xx, and a transient
-    // failure will be picked up by a later event or a manual sync anyway.
-    console.error(`[strava webhook] sync failed for user ${userId}:`, e)
-  }
+
+    try {
+      const result = await syncStravaActivities(userId, createAdminClient())
+      console.log(
+        `[strava webhook] sync ok for user ${userId}: ${result.synced} activit${
+          result.synced === 1 ? 'y' : 'ies'
+        } upserted`
+      )
+
+      // Updates still refresh the activity data, but only a newly posted run
+      // should create a post-run reminder.
+      if (event.aspect_type === 'create' && event.object_id) {
+        const notification = await sendRunNotification(userId, String(event.object_id))
+        console.log(
+          `[strava webhook] push result for activity ${event.object_id}: ${JSON.stringify(notification)}`
+        )
+      }
+    } catch (error) {
+      console.error(`[strava webhook] background processing failed for user ${userId}:`, error)
+    }
+  })
 
   return NextResponse.json({ received: true })
 }
