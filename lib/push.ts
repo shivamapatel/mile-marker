@@ -85,6 +85,24 @@ async function deliverToSubscriptions(
 export async function sendRunNotification(userId: string, activityId: string) {
   const admin = createAdminClient()
 
+  // Strava emits create webhooks for every activity type. Only continue when
+  // the exact webhook activity was persisted by Mile Marker's run-only sync.
+  const { data: activity, error: activityError } = await admin
+    .from('activities')
+    .select('sport_type')
+    .eq('user_id', userId)
+    .eq('id', activityId)
+    .maybeSingle<{ sport_type: string | null }>()
+
+  if (activityError) throw activityError
+
+  const isRun =
+    activity?.sport_type === 'Run' ||
+    activity?.sport_type === 'TrailRun' ||
+    activity?.sport_type === 'VirtualRun'
+
+  if (!isRun) return { delivered: 0, skipped: 'not_a_run' as const }
+
   const { data: subscriptions, error: subscriptionsError } = await admin
     .from('push_subscriptions')
     .select('id,endpoint,p256dh_key,auth_key')
@@ -105,20 +123,11 @@ export async function sendRunNotification(userId: string, activityId: string) {
   }
   if (claimError) throw claimError
 
-  const { data: activity } = await admin
-    .from('activities')
-    .select('name')
-    .eq('user_id', userId)
-    .eq('id', activityId)
-    .maybeSingle()
-
   const delivered = await deliverToSubscriptions(
     subscriptions as DbPushSubscription[],
     {
       title: 'Mile Marker',
-      body: activity?.name
-        ? `${activity.name} is ready for your reflection.`
-        : 'Your run is ready for your reflection.',
+      body: 'Your recent run is ready for reflection.',
       url: `/activities/${activityId}/reflect`,
     }
   )
