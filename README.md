@@ -16,7 +16,7 @@ I am a believer that simple activities we do every day are overlooked forms of t
 
 Mile Marker treats every completed run as an invitation to capture reflections. Finish a run, post it to Strava get an immediate nudge, and capture a short private reflection: feeling, energy level, and any notes on what you were thinking about during the run. No public feed, no analytics dashboard. Just a running (pun intended) journal tied to your runs. 
 
-Over time, I plan to build intelligent capabilities that synthesize across your independent run reflections and surface themes. 
+If you opt in, Mile Marker uses LLMs to synthesize your individual reflections into a private monthly digest—surfacing recurring themes, showing how your energy shifted across runs, and offering a question to carry into the month ahead.
 
 How is this different from Strava? Strava I’ve found is great for logging *what* happened on a run (pace, distance, etc.) but not capturing *how it felt*. 
 
