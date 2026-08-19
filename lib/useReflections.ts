@@ -33,11 +33,15 @@ function fromDb(row: DbReflection): Reflection {
 }
 
 export function useReflections() {
-  const [reflections, setReflections] = useState<Record<string, Reflection>>(MOCK_REFLECTIONS)
+  const hasSupabaseEnv =
+    !!process.env.NEXT_PUBLIC_SUPABASE_URL && !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  const [reflections, setReflections] = useState<Record<string, Reflection>>(
+    hasSupabaseEnv ? {} : MOCK_REFLECTIONS
+  )
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    if (!hasSupabaseEnv) {
       setLoading(false)
       return
     }
@@ -53,11 +57,11 @@ export function useReflections() {
           for (const row of data as DbReflection[]) {
             saved[row.activity_id] = fromDb(row)
           }
-          setReflections({ ...MOCK_REFLECTIONS, ...saved })
+          setReflections(saved)
         }
         setLoading(false)
       })
-  }, [])
+  }, [hasSupabaseEnv])
 
   async function saveReflection(reflection: Reflection) {
     const supabase = createClient()

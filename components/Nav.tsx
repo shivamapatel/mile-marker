@@ -6,6 +6,7 @@ export default function Nav() {
   const pathname = usePathname()
   const isHome = pathname === '/'
   const isActivities = pathname.startsWith('/activities')
+  const isDigest = pathname.startsWith('/monthly-digest')
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-ivory border-t border-sand">
@@ -28,8 +29,28 @@ export default function Nav() {
           <ListIcon bold={isActivities} />
           Activities
         </Link>
+        <Link
+          href="/monthly-digest"
+          className={`flex-1 flex flex-col items-center gap-1 py-3 text-xs transition-colors ${
+            isDigest ? 'text-espresso' : 'text-mocha'
+          }`}
+        >
+          <DigestIcon bold={isDigest} />
+          Digest
+        </Link>
       </div>
     </nav>
+  )
+}
+
+function DigestIcon({ bold }: { bold: boolean }) {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      strokeWidth={bold ? 2.2 : 1.5} strokeLinecap="round" strokeLinejoin="round">
+      <path d="M9 18h6" />
+      <path d="M10 22h4" />
+      <path d="M8.5 14.5A6 6 0 1115.5 14.5C14.5 15.2 14 16 14 18h-4c0-2-.5-2.8-1.5-3.5z" />
+    </svg>
   )
 }
 

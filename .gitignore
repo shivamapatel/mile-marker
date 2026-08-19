@@ -38,6 +38,7 @@ yarn-error.log*
 
 # local tooling + iCloud duplicate junk
 .claude/
+/supabase/.temp/
 *\ 2.json
 *\ 2.*
 

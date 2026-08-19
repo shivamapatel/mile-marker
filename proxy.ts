@@ -10,7 +10,10 @@ export async function proxy(request: NextRequest) {
   // The Strava webhook is called by Strava's servers with no user session. It
   // must bypass the auth guard entirely, or the session check below would
   // redirect Strava's request to /login and the events would never arrive.
-  if (request.nextUrl.pathname.startsWith('/api/strava/webhook')) {
+  if (
+    request.nextUrl.pathname.startsWith('/api/strava/webhook') ||
+    request.nextUrl.pathname.startsWith('/api/cron/monthly-digests')
+  ) {
     return NextResponse.next({ request })
   }
 
